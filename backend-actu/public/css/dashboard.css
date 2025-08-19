@@ -1,0 +1,30 @@
+body.light-theme {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+body.dark-theme {
+  background-color: #212529;
+  color: #f8f9fa;
+}
+
+.dark-theme .navbar,
+.dark-theme .card {
+  background-color: #343a40 !important;
+  color: #f8f9fa !important;
+}
+
+#sidebar {
+  width: 220px;
+}
+#sidebar .nav-link {
+  color: #adb5bd;
+}
+#sidebar .nav-link.active {
+  color: #ffffff;
+  background-color: #495057;
+}
+#sidebar .nav-link:hover {
+  color: #ffffff;
+  background-color: #495057;
+}

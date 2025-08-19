@@ -1,0 +1,6 @@
+# Ignore MongoDB playground files
+*.mongodb.js
+.env
+.env.local
+.env.prod
+
