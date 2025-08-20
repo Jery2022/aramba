@@ -39,12 +39,34 @@ exports.remove = async (req, res) => {
 };
 
 
-exports.getAll = async (req, res) => {
+exports.getAllActualites = async (req, res) => {
   try {
-    const actualites = await Actualite.find().populate('commentaires');
-    res.status(200).json(actualites);
+    // Définir des options de requête par défaut
+    const { page = 1, limit = 10, sortBy = 'dateCreation', order = 'desc' } = req.query;
+
+    // Calculer le nombre de documents à sauter (pour la pagination)
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const sortOptions = {};
+    sortOptions[sortBy] = order === 'desc' ? -1 : 1;
+
+    const actualites = await Actualite.find()
+      .populate('commentaires')
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const totalActualites = await Actualite.countDocuments();
+
+    res.status(200).json({
+      total: totalActualites,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      actualites: actualites,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur serveur', error });
+    console.error('Erreur lors de la récupération des actualités :', error);
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
 

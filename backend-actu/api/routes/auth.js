@@ -59,3 +59,29 @@ router.post('/reset', async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 });
+
+router.get('/profil', verify, checkActif, (req, res) => {
+  res.json({ message: 'Informations du profil utilisateur' });
+});
+
+router.get('/api', (req, res) => {
+  res.json({ message: 'Bienvenue sur l’API de gestion des actualités d’entreprise 🚀' });
+});
+
+router.get('/api/auth', (req, res) => {
+  res.json({ message: 'Bienvenue sur l’API d’authentification 🚀' });
+});
+
+router.post('/api/auth/inscription', (req, res) => {
+  res.json({ message: 'Inscription réussie' });
+});
+
+router.post('/api/auth/connexion', (req, res) => {
+  res.json({ message: 'Connexion réussie' });
+});
+
+router.post('/api/auth/deconnexion', (req, res) => {
+  res.json({ message: 'Déconnexion réussie' }); 
+});
+
+module.exports = router;

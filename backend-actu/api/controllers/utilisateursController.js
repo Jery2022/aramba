@@ -1,4 +1,7 @@
 const Utilisateur = require('../models/Utilisateur');
+const bcrypt = require('bcrypt');  
+const jwt = require('jsonwebtoken');  
+const config = require('./../../config/config.js');  
 
 exports.getAll = async (req, res) => {
   try {
@@ -11,22 +14,37 @@ exports.getAll = async (req, res) => {
 
 exports.remove = async (req, res) => {
   try {
-    await Utilisateur.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'Utilisateur supprimé' });
+    const { id } = req.params;
+
+    const utilisateur = await Utilisateur.findById(id);
+    if (!utilisateur) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    await Utilisateur.findByIdAndDelete(id);
+    res.status(200).json({ message: 'Utilisateur supprimé avec succès.' });
   } catch (error) {
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
 
+
 exports.create = async (req, res) => {
-  try {
-    const { nom, email, motDePasse, role } = req.body;
-    const nouvelUtilisateur = new Utilisateur({ nom, email, motDePasse, role });
-    await nouvelUtilisateur.save();
-    res.status(201).json(nouvelUtilisateur);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur serveur', error });
-  }
+ try {
+ const { nom, email, motDePasse, role } = req.body;
+
+    // Validation des champs
+if (!nom || !email || !motDePasse) {
+return res.status(400).json({ message: 'Nom, email et mot de passe sont requis.' });
+}
+
+const nouvelUtilisateur = new Utilisateur({ nom, email, motDePasse, role });
+await nouvelUtilisateur.save();
+res.status(201).json(nouvelUtilisateur);
+} catch (error) {
+console.error('Erreur lors de la création d\'un utilisateur :', error);
+res.status(500).json({ message: 'Erreur serveur', error: error.message });
+}
 };
 
 exports.getById = async (req, res) => {
@@ -42,20 +60,27 @@ exports.getById = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  try {
-    const { nom, email, motDePasse, role } = req.body;
-    const utilisateur = await Utilisateur.findByIdAndUpdate(
-      req.params.id,
-      { nom, email, motDePasse, role },
-      { new: true }
-    );
-    if (!utilisateur) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
-    res.status(200).json(utilisateur);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur serveur', error });
-  }
+try {
+    // Créer un objet de mise à jour avec seulement les champs fournis
+const updateData = {};
+if (req.body.nom) updateData.nom = req.body.nom;
+if (req.body.email) updateData.email = req.body.email;
+if (req.body.role) updateData.role = req.body.role;
+
+const utilisateur = await Utilisateur.findByIdAndUpdate(
+req.params.id,
+updateData,
+{ new: true }
+ );
+
+ if (!utilisateur) {
+   return res.status(404).json({ message: 'Utilisateur non trouvé' });
+ }
+ res.status(200).json(utilisateur);
+} catch (error) {
+ console.error('Erreur lors de la mise à jour de l\'utilisateur :', error);
+  res.status(500).json({ message: 'Erreur serveur', error: error.message });
+}
 };
 
 exports.resetPassword = async (req, res) => {
@@ -171,24 +196,37 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, motDePasse } = req.body;
+const { email, motDePasse } = req.body;
 
-    // Vérification de l'existence de l'utilisateur
-    const utilisateur = await Utilisateur.findOne({ email });
-    if (!utilisateur) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
-    // Vérification du mot de passe
-    const isMatch = await bcrypt.compare(motDePasse, utilisateur.motDePasse);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Mot de passe incorrect' });
-    }
-    // Mise à jour de la date de dernière connexion
+    // Vérification des champs requis
+ if (!email || !motDePasse) {
+ return res.status(400).json({ message: 'Email et mot de passe requis' });
+ }
+
+    // Recherche de l'utilisateur
+ const utilisateur = await Utilisateur.findOne({ email });
+ if (!utilisateur) {
+ return res.status(401).json({ message: 'Email ou mot de passe incorrect' }); // Plus sécurisé de ne pas spécifier si l'email ou le mdp est faux
+ }
+
+    // Vérification du mot de passe
+ const isMatch = await bcrypt.compare(motDePasse, utilisateur.motDePasse);
+ if (!isMatch) {
+ return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+ }
+
+    // Mise à jour de la dernière connexion
     utilisateur.dateDerniereConnexion = new Date();
     await utilisateur.save();
-    // Génération du token
-    const token = jwt.sign({ id: utilisateur._id, role: utilisateur.role }, config.jwtSecret, { expiresIn: '1h' });
 
+    // Génération du token JWT
+    const token = jwt.sign(
+      { id: utilisateur._id, role: utilisateur.role },
+      config.jwtSecret,
+      { expiresIn: '1h' }
+    );
+
+    // Réponse structurée
     res.status(200).json({
       message: 'Connexion réussie',
       token,
@@ -196,15 +234,16 @@ exports.login = async (req, res) => {
         id: utilisateur._id,
         email: utilisateur.email,
         nom: utilisateur.nom,
-        prenom: utilisateur.prenom,
         role: utilisateur.role,
-        preferences: utilisateur.preferences
+        preferences: utilisateur.preferences || {}
       }
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur serveur', error });
-  }
+} catch (error) {
+ console.error('❌ Erreur lors de la connexion :', error);
+ res.status(500).json({ message: 'Erreur serveur', error: error.message });
+}
 };
+
 
 exports.getProfile = async (req, res) => {
   try {

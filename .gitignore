@@ -2,7 +2,7 @@ node_modules/
 test/
 dist/
 coverage/
-documentations/
+documentations/ 
 .env
 .env.local
 .env.prod
@@ -12,3 +12,5 @@ yarn-debug.log
 yarn-error.log
 *.mongodb
 *.log
+package-lock.json
+gest-actualites-app.code-workspace
