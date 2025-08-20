@@ -2,8 +2,15 @@
   "name": "gest-actualites-app",
   "version": "1.0.0",
   "description": "��#\u0000 \u0000a\u0000r\u0000a\u0000m\u0000b\u0000a\u0000\r\u0000 \u0000",
-  "main": "index.js",
+  "main": "backend-actu/server.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon backend-actu/server.js",
+    "build": "echo \"No build step defined\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,7 +28,9 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "csurf": "^1.11.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",

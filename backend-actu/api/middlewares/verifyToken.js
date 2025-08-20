@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Utilisateur = require('../models/Utilisateur');
 
-exports.authentifier = async (req, res, next) => {
+exports.authentifier = async function (req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ message: 'Token manquant' });
@@ -27,3 +27,6 @@ exports.autoriserRole = (roles) => {
     next();
   };
 };
+
+
+

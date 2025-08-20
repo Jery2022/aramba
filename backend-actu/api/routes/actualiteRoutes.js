@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const actualiteController = require('../controllers/actualitesController');
-const verify = require('../middlewares/verifyToken');
+const verify = require('../middlewares/verify');
 const checkActif = require('../middlewares/checkActif');
 const checkRole = require('../middlewares/checkRole');
 
@@ -17,6 +17,6 @@ router.get('/:id', verify, checkActif, actualiteController.getById);
 router.post('/', verify, checkActif, actualiteController.create);
 router.post('/:id/valider', verify, checkActif, checkRole('rh'), actualiteController.validate);
 router.get('/search/tag', verify, checkActif, actualiteController.searchByTag);
-router.get('/search/filtre', verify, checkActif, actualiteController.searchByFiltre);
+router.get('/search/filtre', verify, checkActif, actualiteController.searchByFiltre); 
 
 module.exports = router;

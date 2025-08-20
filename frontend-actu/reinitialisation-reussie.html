@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Réinitialisation réussie</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2>Réinitialisation du mot de passe</h2>
+    <form id="resetForm">
+      <div class="mb-3">
+        <label for="newPassword" class="form-label">Nouveau mot de passe</label>
+        <input type="password" class="form-control" id="newPassword" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Réinitialiser</button>
+    </form>
+
+    <div id="successMessage" class="alert alert-success mt-3 d-none" role="alert">
+      ✅ Mot de passe réinitialisé avec succès !
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('resetForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const motDePasse = document.getElementById('newPassword').value;
+
+      try {
+        const response = await fetch('/api/auth/reset', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ motDePasse, token: 'TON_TOKEN_ICI' }) // Remplace par le vrai token
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          document.getElementById('successMessage').classList.remove('d-none');
+        } else {
+          alert(result.message || 'Erreur lors de la réinitialisation.');
+        }
+      } catch (error) {
+        alert('Erreur réseau ou serveur.');
+      }
+    });
+  </script>
+</body>
+</html>

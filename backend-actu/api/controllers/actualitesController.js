@@ -39,7 +39,7 @@ exports.remove = async (req, res) => {
 };
 
 
-exports.getActualites = async (req, res) => {
+exports.getAll = async (req, res) => {
   try {
     const actualites = await Actualite.find().populate('commentaires');
     res.status(200).json(actualites);
@@ -48,7 +48,7 @@ exports.getActualites = async (req, res) => {
   }
 };
 
-exports.creerActualite = async (req, res) => {
+exports.create = async (req, res) => {
   try {
     const nouvelleActualite = new Actualite(req.body);
     await nouvelleActualite.save();
@@ -58,7 +58,20 @@ exports.creerActualite = async (req, res) => {
   }
 };
 
-exports.validerActualite = async (req, res) => {
+exports.getById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const actualite = await Actualite.findById(id).populate('commentaires');
+    if (!actualite) {
+      return res.status(404).json({ message: 'Actualité non trouvée' });
+    }
+    res.status(200).json(actualite);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
+
+exports.validate = async (req, res) => {
   try {
     const actualite = await Actualite.findByIdAndUpdate(req.params.id, { statutValidation: true }, { new: true });
     res.status(200).json(actualite);
@@ -66,3 +79,24 @@ exports.validerActualite = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
+
+exports.searchByTag = async (req, res) => {
+  try {
+    const { tag } = req.query;
+    const actualites = await Actualite.find({ tags: tag });
+    res.status(200).json(actualites);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
+
+exports.searchByFiltre = async (req, res) => {
+  try {
+    const { filtre } = req.query;
+    const actualites = await Actualite.find({ filtre });
+    res.status(200).json(actualites);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error });
+  }
+};
+

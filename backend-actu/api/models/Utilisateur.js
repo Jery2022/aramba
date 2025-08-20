@@ -26,6 +26,14 @@ const utilisateurSchema = new mongoose.Schema({
   actif: {
     type: Boolean,
     default: true
+  },
+  resetToken: {
+    type: String,
+    //default: null
+  },
+  resetTokenExpire: {
+    type: Date,
+   // default: null
   }
 }, {
   timestamps: true

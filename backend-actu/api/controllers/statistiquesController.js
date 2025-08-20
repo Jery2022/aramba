@@ -2,7 +2,7 @@ const Actualite = require('../models/Actualite');
 const Utilisateur = require('../models/Utilisateur');
 const Commentaire = require('../models/Commentaire');
 
-exports.getStats = async (req, res) => {
+exports.getStats = async function (req, res) {
   try {
     const totalActualites = await Actualite.countDocuments();
     const actualitesValidees = await Actualite.countDocuments({ statutValidation: true });
@@ -21,3 +21,4 @@ exports.getStats = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors du calcul des statistiques', error });
   }
 };
+ 

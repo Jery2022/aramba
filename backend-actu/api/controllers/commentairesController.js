@@ -36,7 +36,7 @@ exports.remove = async (req, res) => {
 };
 
 
-exports.ajouterCommentaire = async (req, res) => {
+exports.create = async (req, res) => {
   try {
     const nouveauCommentaire = new Commentaire({
       actualite: req.params.id,
@@ -50,7 +50,7 @@ exports.ajouterCommentaire = async (req, res) => {
   }
 };
 
-exports.getCommentaires = async (req, res) => {
+exports.getAll = async (req, res) => {
   try {
     const commentaires = await Commentaire.find({ actualite: req.params.id });
     res.status(200).json(commentaires);
